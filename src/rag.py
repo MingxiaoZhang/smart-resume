@@ -23,7 +23,8 @@ def get_resume(experiences, job_description):
     documents = build_documents_for_rag(experiences=experiences, job_description=job_description)
     res = co.chat(
         model="command-r-plus",
-        message=f"Generate a resume for the job of {job_description["title"]} at {job_description["company"]} based on the following job description and candidate's work experiences:\n",
+        message=f"Generate a resume for the job of {job_description['title']} at {job_description['company']} based on the following job description and candidate's work experiences:\n",
         documents=documents
     )
+
     return res.text

@@ -146,11 +146,10 @@ def generate_resume():
     
     experiences = Experience.query.filter_by(user_id=user.id).all()
     
-    data = request.get_json()
-    job_description = {"company": data["company"], "title": data["title"], "text": data["text"]}
+    job_description = {"company": request.args.get('company'), "title": request.args.get('title'), "text": request.args.get('text')}
 
     resume = get_resume(experiences=experiences, job_description=job_description)
-    
+    print(resume)
     return jsonify({'resume': resume}), 200
 
 if __name__ == '__main__':
