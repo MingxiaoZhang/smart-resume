@@ -1,3 +1,4 @@
+import json
 import os
 from dotenv import load_dotenv
 import cohere
@@ -15,16 +16,13 @@ def build_snippet(experience):
         snippet += f"{accomplishment}\n"
     return snippet
 
-def build_documents_for_rag(experiences, job_description):
+def get_resume(user_info, experiences, job_data):
     documents = [{"title": build_title(exp), "snippet": build_snippet(exp)} for exp in experiences]
-    documents.append({"title": "Job Description", "snippet": job_description["text"]})
-
-def get_resume(experiences, job_description):
-    documents = build_documents_for_rag(experiences=experiences, job_description=job_description)
+    documents.append({"title": "Job Description", "snippet": job_data["description"]})
+    documents.append({"title": "Basic Candidate Information", "snippet": json.dumps(user_info)})
     res = co.chat(
         model="command-r-plus",
-        message=f"Generate a resume for the job of {job_description['title']} at {job_description['company']} based on the following job description and candidate's work experiences:\n",
+        message=f"Generate a resume for the job of {job_data['title']} at {job_data['company']} based on the following job description and candidate's work experiences:\n",
         documents=documents
     )
-
     return res.text

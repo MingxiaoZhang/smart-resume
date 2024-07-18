@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from config import Config
-from models import db, bcrypt, User, Experience
+from flask_cors import CORS
+from src.config import Config
+from src.models import Resume, db, bcrypt, User, Experience
 from datetime import datetime
-from rag import get_resume
+from src.rag import get_resume
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
+CORS(app)
 jwt = JWTManager(app)
 
 @app.route('/register', methods=['POST'])
@@ -15,10 +17,8 @@ def register():
     data = request.get_json()
     username = data['username']
     password = data['password']
-    
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = User(username=username, password=hashed_password)
-    
     db.session.add(new_user)
     db.session.commit()
     
@@ -34,9 +34,23 @@ def login():
     
     if user and bcrypt.check_password_hash(user.password, password):
         access_token = create_access_token(identity=user.username)
-        return jsonify({'access_token': access_token}), 200
+        return jsonify({'token': access_token}), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
+
+@app.route('/get_user', methods=['GET'])
+@jwt_required()
+def get_user():
+    print(request)
+    current_user = get_jwt_identity()
+    
+    print(current_user)
+    user = User.query.filter_by(username=current_user).first()
+    
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+    
+    return jsonify({'user': current_user}), 200
 
 @app.route('/update_info', methods=['PUT'])
 @jwt_required()
@@ -134,22 +148,39 @@ def get_user_info():
     
     return jsonify({'user_info': user_info}), 200
 
-@app.route('/get_resume', methods=['GET'])
+@app.route('/get_resume', methods=['POST'])
 @jwt_required()
 def generate_resume():
     current_user = get_jwt_identity()
-    
     user = User.query.filter_by(username=current_user).first()
     
     if not user:
         return jsonify({'message': 'User not found'}), 404
     
+    user_info = {
+        'username': user.username,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name
+    }
     experiences = Experience.query.filter_by(user_id=user.id).all()
-    
-    job_description = {"company": request.args.get('company'), "title": request.args.get('title'), "text": request.args.get('text')}
+    company = request.args.get('company')
+    job_title = request.args.get('title')
+    job_description = request.args.get('text')
+    job_data = {"company": company, "title": job_title, "description": job_description}
+    resume = get_resume(user_info=user_info, experiences=experiences, job_data=job_data)
 
-    resume = get_resume(experiences=experiences, job_description=job_description)
-    print(resume)
+    new_resume = Resume(
+        user_id=user.id,
+        company=company,
+        job_title=job_title,
+        job_description=job_description,
+        resume=resume
+    )
+    
+    db.session.add(new_resume)
+    db.session.commit()
+    
     return jsonify({'resume': resume}), 200
 
 if __name__ == '__main__':

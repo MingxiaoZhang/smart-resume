@@ -21,3 +21,11 @@ class Experience(db.Model):
     end_date = db.Column(db.Date, nullable=True)
     job_title = db.Column(db.String(150), nullable=False)
     accomplishments = db.Column(db.ARRAY(db.String), nullable=True)
+
+class Resume(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    company = db.Column(db.String(150), nullable=False)
+    job_title = db.Column(db.String(150), nullable=False)
+    job_description = db.Column(db.String(500), nullable=False)
+    resume = db.Column(db.String(500), nullable=False)

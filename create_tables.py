@@ -1,5 +1,5 @@
-from api.app import app
-from api.models import db
+from src.app import app
+from src.models import db
 
 with app.app_context():
     db.create_all()
