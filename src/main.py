@@ -1,7 +1,6 @@
 import json
 from flask import Flask, Blueprint, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from flask_cors import CORS
 from src.config import Config
 from src.models import Education, Project, Resume, db, bcrypt, User, Experience
 from datetime import datetime
@@ -10,7 +9,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
-    CORS(app)
     jwt = JWTManager(app)
 
     from src.routes.auth import auth
@@ -28,7 +26,3 @@ def create_app():
     app.register_blueprint(resume, url_prefix='/resume')
 
     return app
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)

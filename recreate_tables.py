@@ -1,4 +1,4 @@
-from src.app import create_app
+from src.main import create_app
 from src.models import Resume, db
 
 app = create_app()
