@@ -20,12 +20,33 @@ class Experience(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=True)
     job_title = db.Column(db.String(150), nullable=False)
-    accomplishments = db.Column(db.ARRAY(db.String), nullable=True)
+    accomplishments = db.Column(db.Text, nullable=True)
 
 class Resume(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     company = db.Column(db.String(150), nullable=False)
     job_title = db.Column(db.String(150), nullable=False)
-    job_description = db.Column(db.String(500), nullable=False)
-    resume = db.Column(db.String(500), nullable=False)
+    job_description = db.Column(db.Text, nullable=False)
+    resume = db.Column(db.Text, nullable=False)
+    creation_date = db.Column(db.Date, nullable=False)
+    last_edit_date = db.Column(db.Date, nullable=False)
+
+class Education(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    school = db.Column(db.String(150), nullable=False)
+    degree = db.Column(db.String(150), nullable=True)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=True)
+    courses_taken = db.Column(db.Text, nullable=True)
+
+class Project(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    project_org = db.Column(db.String(150), nullable=True)
+    project_name = db.Column(db.String(150), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=True)
+    project_link = db.Column(db.String(150), nullable=True)
+    accomplishments = db.Column(db.Text, nullable=True)
