@@ -18,6 +18,7 @@ def get_projects():
     projects = Project.query.filter_by(user_id=user.id).all()
     
     projects_list = [{
+        'id': project.id,
         'project_name': project.project_name,
         'project_org': project.project_org,
         'start_date': project.start_date.strftime('%Y-%m-%d'),

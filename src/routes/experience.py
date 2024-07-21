@@ -48,6 +48,7 @@ def get_experiences():
     experiences = Experience.query.filter_by(user_id=user.id).all()
     
     experiences_list = [{
+        'id': exp.id,
         'company': exp.company,
         'start_date': exp.start_date.strftime('%Y-%m-%d'),
         'end_date': exp.end_date.strftime('%Y-%m-%d') if exp.end_date else None,
@@ -62,6 +63,8 @@ def get_experiences():
 def update_experience():
     data = request.get_json()
     id = data.get('id')
+    # TODO: Check if experience's user id matches user id from request
+    
     company = data.get('company')
     job_title = data.get('job_title')
     start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
