@@ -59,3 +59,28 @@ def add_project():
     db.session.commit()
     
     return jsonify({'message': 'Project added successfully!'}), 201
+
+@project.route('/update_project', methods=['PUT'])
+@jwt_required()
+def update_project():
+    data = request.get_json()
+    id = data.get('id')
+    project_name = data.get('project_name')
+    project_org = data.get('project_org')
+    project_link = data.get('project_link')
+    start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+    end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d') if 'end_date' in data else None
+    accomplishments = data.get('accomplishments')
+    
+    project = Project.query.get(id)
+    
+    project.project_name = project_name
+    project.project_org = project_org
+    project.project_link = project_link
+    project.start_date = start_date
+    project.end_date = end_date
+    project.accomplishments = accomplishments 
+    
+    db.session.commit()
+    
+    return jsonify({'message': 'Project updated successfully!'}), 200

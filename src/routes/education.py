@@ -18,6 +18,7 @@ def get_education():
     education = Education.query.filter_by(user_id=user.id).all()
     
     education_list = [{
+        'id': edu.id,
         'school': edu.school,
         'degree': edu.degree,
         'start_date': edu.start_date.strftime('%Y-%m-%d'),
@@ -37,11 +38,11 @@ def add_education():
         return jsonify({'message': 'User not found'}), 404
     
     data = request.get_json()
-    school = data['school']
-    degree = data['degree']
-    start_date = datetime.strptime(data['start_date'], '%Y-%m-%d')
-    end_date = datetime.strptime(data['end_date'], '%Y-%m-%d') if 'end_date' in data else None
-    courses_taken = data['courses_taken']
+    school = data.get('school')
+    degree = data.get('degree')
+    start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+    end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d') if 'end_date' in data else None
+    courses_taken = data.get('courses_taken')
 
     new_education = Education(
         user_id=user.id,
@@ -56,3 +57,26 @@ def add_education():
     db.session.commit()
     
     return jsonify({'message': 'Education added successfully!'}), 201
+
+@education.route('/update_education', methods=['PUT'])
+@jwt_required()
+def update_info():
+    data = request.get_json()
+    id = data.get('id')
+    school = data.get('school')
+    degree = data.get('degree')
+    start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+    end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d') if 'end_date' in data else None
+    courses_taken = data.get('courses_taken')
+    
+    education = Education.query.get(id)
+    
+    education.school = school
+    education.degree = degree
+    education.start_date = start_date
+    education.end_date = end_date
+    education.courses_taken = courses_taken 
+    
+    db.session.commit()
+    
+    return jsonify({'message': 'Education updated successfully!'}), 200

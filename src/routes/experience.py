@@ -57,3 +57,25 @@ def get_experiences():
     
     return jsonify({'experiences': experiences_list}), 200
 
+@experience.route('/update_experience', methods=['PUT'])
+@jwt_required()
+def update_experience():
+    data = request.get_json()
+    id = data.get('id')
+    company = data.get('company')
+    job_title = data.get('job_title')
+    start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+    end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d') if 'end_date' in data else None
+    accomplishments = data.get('accomplishments')
+    
+    experience = Experience.query.get(id)
+    
+    experience.company = company
+    experience.job_title = job_title
+    experience.start_date = start_date
+    experience.end_date = end_date
+    experience.accomplishments = accomplishments 
+    
+    db.session.commit()
+    
+    return jsonify({'message': 'Experience updated successfully!'}), 200
