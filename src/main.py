@@ -2,7 +2,7 @@ import json
 from flask import Flask, Blueprint, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from src.config import Config
-from src.models import Education, Project, Resume, db, bcrypt, User, Experience
+from src.models import db
 from datetime import datetime
 
 def create_app():

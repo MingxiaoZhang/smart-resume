@@ -1,5 +1,5 @@
-from src.main import create_app
-from src.models import Resume, db
+from api.src.main import create_app
+from api.src.models import Resume, db
 
 app = create_app()
 

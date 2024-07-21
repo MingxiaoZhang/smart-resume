@@ -30,4 +30,4 @@ def get_resume(user_info, experiences, job_data):
         documents=documents
     )
     print(res.text)
-    return res.text
+    return user_info, job_data, res.text
