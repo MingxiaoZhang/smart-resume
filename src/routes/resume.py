@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 from src.rag import get_resume
 
-from worker import q
+from src.worker import q
 
 resume = Blueprint('resume', __name__)
 
