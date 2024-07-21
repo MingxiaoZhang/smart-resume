@@ -1,10 +1,34 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, redirect, url_for
 from src.models import User, Experience, Resume, db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 from src.rag import get_resume
 
+from worker import q
+
 resume = Blueprint('resume', __name__)
+
+def generate_and_store(user, experiences, job_data):
+    user_info = {
+        'username': user.username,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name
+    }
+    resume = get_resume(user_info=user_info, experiences=experiences, job_data=job_data)
+    new_resume = Resume(
+        user_id=user.id,
+        company=job_data.get('company'),
+        job_title=job_data.get('job_title'),
+        job_description=job_data.get('job_description'),
+        creation_date=datetime.now(),
+        last_edit_date=datetime.now(),
+        resume=resume
+    )
+    
+    db.session.add(new_resume)
+    db.session.commit()
+    return jsonify({'finished': True, 'resumeId': new_resume.id}), 201
 
 @resume.route('/generate_resume', methods=['POST'])
 @jwt_required()
@@ -15,34 +39,23 @@ def generate_resume():
     if not user:
         return jsonify({'message': 'User not found'}), 404
     
-    user_info = {
-        'username': user.username,
-        'email': user.email,
-        'first_name': user.first_name,
-        'last_name': user.last_name
-    }
     experiences = Experience.query.filter_by(user_id=user.id).all()
     data = request.get_json()
     company = data.get('company')
     job_title = data.get('title')
     job_description = data.get('description')
     job_data = {"company": company, "title": job_title, "description": job_description}
-    resume = get_resume(user_info=user_info, experiences=experiences, job_data=job_data)
+    background_job = q.enqueue(generate_and_store, user, experiences, job_data)
+    return jsonify({'task_id': background_job.get_id()}), 202
+    
+@resume.route('/results/<job_id>', methods=['GET'])
+def get_results(job_id):
+    job = q.fetch_job(job_id)
+    if job.is_finished:
+        return job.result
+    else:
+        return jsonify({'finished': False}), 202
 
-    new_resume = Resume(
-        user_id=user.id,
-        company=company,
-        job_title=job_title,
-        job_description=job_description,
-        creation_date=datetime.now(),
-        last_edit_date=datetime.now(),
-        resume=resume
-    )
-    
-    db.session.add(new_resume)
-    db.session.commit()
-    
-    return jsonify({'resumeId': new_resume.id}), 201
 
 @resume.route('/get_resume', methods=['GET'])
 @jwt_required()
@@ -73,7 +86,6 @@ def get_all_resume():
         'last_edit_date': resume.end_date.strftime('%Y-%m-%d'),
         'job_title': resume.job_title,
         'job_description': resume.job_description,
-        'resume': resume.resume
     } for resume in resumes]
     
     return jsonify({'resumeList': resume_list}), 200
