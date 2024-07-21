@@ -1,10 +1,11 @@
 import os
+from urllib.parse import urlparse
 import redis
 from rq import Worker, Queue, Connection
 
 listen = ['default']
-redis_url = os.getenv('REDIS_TLS_URL')
-conn = redis.from_url(redis_url)
+url = urlparse(os.environ.get("REDIS_URL"))
+conn = redis.Redis(host=url.hostname, port=url.port, password=url.password, ssl=True, ssl_cert_reqs=None)
 q = Queue(connection=conn)
 
 if __name__ == '__main__':
