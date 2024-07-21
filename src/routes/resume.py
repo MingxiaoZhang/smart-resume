@@ -15,7 +15,9 @@ def generate_and_store(user, experiences, job_data):
         'first_name': user.first_name,
         'last_name': user.last_name
     }
+    print(job_data)
     resume = get_resume(user_info=user_info, experiences=experiences, job_data=job_data)
+    print(resume)
     new_resume = Resume(
         user_id=user.id,
         company=job_data.get('company'),
@@ -45,6 +47,7 @@ def generate_resume():
     job_title = data.get('title')
     job_description = data.get('description')
     job_data = {"company": company, "title": job_title, "description": job_description}
+    print("Add to queue")
     background_job = q.enqueue(generate_and_store, user, experiences, job_data)
     return jsonify({'task_id': background_job.get_id()}), 202
     
