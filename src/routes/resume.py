@@ -78,6 +78,7 @@ def get_all_resume():
     resumes = Resume.query.filter_by(user_id=user.id).all()
     
     resume_list = [{
+        'id': resume.id,
         'company': resume.company,
         'creation_date': resume.creation_date.strftime('%Y-%m-%d'),
         'last_edit_date': resume.last_edit_date.strftime('%Y-%m-%d'),
