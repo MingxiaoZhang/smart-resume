@@ -81,8 +81,7 @@ def get_all_resume():
         'company': resume.company,
         'creation_date': resume.creation_date.strftime('%Y-%m-%d'),
         'last_edit_date': resume.end_date.strftime('%Y-%m-%d'),
-        'job_title': resume.job_title,
-        'job_description': resume.job_description,
+        'job_title': resume.job_title
     } for resume in resumes]
     
     return jsonify({'resumeList': resume_list}), 200
