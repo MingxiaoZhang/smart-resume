@@ -80,7 +80,7 @@ def get_all_resume():
     resume_list = [{
         'company': resume.company,
         'creation_date': resume.creation_date.strftime('%Y-%m-%d'),
-        'last_edit_date': resume.end_date.strftime('%Y-%m-%d'),
+        'last_edit_date': resume.last_edit_date.strftime('%Y-%m-%d'),
         'job_title': resume.job_title
     } for resume in resumes]
     
@@ -99,6 +99,7 @@ def update_resume():
         return jsonify({'message': 'Resume not found'}), 404
     
     resume.resume = resume_text
+    resume.last_edit_date = datetime.now()
     
     db.session.commit()
     
