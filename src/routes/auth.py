@@ -28,5 +28,7 @@ def register():
     new_user = User(username=username, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
+
+    access_token = create_access_token(identity=username)
     
-    return jsonify({'message': 'User registered successfully!'}), 201
+    return jsonify({'token': access_token}), 201
