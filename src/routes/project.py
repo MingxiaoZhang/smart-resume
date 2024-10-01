@@ -8,9 +8,8 @@ project = Blueprint('project', __name__)
 @project.route('/get_projects', methods=['GET'])
 @jwt_required()
 def get_projects():
-    current_user = get_jwt_identity()
-    
-    user = User.query.filter_by(username=current_user).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     
     if not user:
         return jsonify({'message': 'User not found'}), 404
@@ -32,9 +31,8 @@ def get_projects():
 @project.route('/add_project', methods=['POST'])
 @jwt_required()
 def add_project():
-    current_user = get_jwt_identity()
-
-    user = User.query.filter_by(username=current_user).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     if not user:
         return jsonify({'message': 'User not found'}), 404
     

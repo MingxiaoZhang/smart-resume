@@ -8,21 +8,19 @@ user = Blueprint('user', __name__)
 @jwt_required()
 def get_user():
     print(request)
-    current_user = get_jwt_identity()
-    
-    user = User.query.filter_by(username=current_user).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     
     if not user:
         return jsonify({'message': 'User not found'}), 404
     
-    return jsonify({'user': current_user}), 200
+    return jsonify({'user': user.username}), 200
 
 @user.route('/get_user_info', methods=['GET'])
 @jwt_required()
 def get_user_info():
-    current_user = get_jwt_identity()
-    
-    user = User.query.filter_by(username=current_user).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     
     if not user:
         return jsonify({'message': 'User not found'}), 404
@@ -39,13 +37,12 @@ def get_user_info():
 @user.route('/update_info', methods=['PUT'])
 @jwt_required()
 def update_info():
-    current_user = get_jwt_identity()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     data = request.get_json()
     email = data.get('email')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
-    
-    user = User.query.filter_by(username=current_user).first()
     
     if not user:
         return jsonify({'message': 'User not found'}), 404

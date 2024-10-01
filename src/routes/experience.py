@@ -8,15 +8,14 @@ experience = Blueprint('experience', __name__)
 @experience.route('/add_experience', methods=['POST'])
 @jwt_required()
 def add_experience():
-    current_user = get_jwt_identity()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     data = request.get_json()
     company = data['company']
     start_date = datetime.strptime(data['start_date'], '%Y-%m-%d')
     end_date = datetime.strptime(data['end_date'], '%Y-%m-%d') if 'end_date' in data else None
     job_title = data['job_title']
     accomplishments = data['accomplishments']
-    
-    user = User.query.filter_by(username=current_user).first()
     
     if not user:
         return jsonify({'message': 'User not found'}), 404
@@ -38,9 +37,8 @@ def add_experience():
 @experience.route('/get_experiences', methods=['GET'])
 @jwt_required()
 def get_experiences():
-    current_user = get_jwt_identity()
-    
-    user = User.query.filter_by(username=current_user).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     
     if not user:
         return jsonify({'message': 'User not found'}), 404

@@ -10,8 +10,8 @@ resume = Blueprint('resume', __name__)
 @resume.route('/generate_resume', methods=['POST'])
 @jwt_required()
 def generate_resume():
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(username=current_user).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     
     if not user:
         return jsonify({'message': 'User not found'}), 404
@@ -68,9 +68,8 @@ def get_resume_by_id():
 @resume.route('/get_all_resume', methods=['GET'])
 @jwt_required()
 def get_all_resume():
-    current_user = get_jwt_identity()
-    
-    user = User.query.filter_by(username=current_user).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     
     if not user:
         return jsonify({'message': 'User not found'}), 404
